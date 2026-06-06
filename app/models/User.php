@@ -40,4 +40,18 @@ class User {
         $stmt = $this->conn->prepare($query);
         return $stmt->execute([$username, $password_hash, $fullname, $phone]);
     }
+
+    public function getTotalUsers() {
+        $query = "SELECT COUNT(*) FROM " . $this->table_name . " WHERE role = 'customer'";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
+
+    public function getAllUsers() {
+        $query = "SELECT id, username, fullname, phone, role, created_at FROM " . $this->table_name . " WHERE role = 'customer' ORDER BY created_at DESC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
 }

@@ -19,6 +19,7 @@
                         <th class="px-4 py-3">Khung giờ</th>
                         <th class="px-4 py-3 text-end">Tổng tiền</th>
                         <th class="px-4 py-3">Trạng thái</th>
+                        <th class="px-4 py-3 text-end">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -41,11 +42,23 @@
                                 <td class="px-4 py-3">
                                     <span class="badge rounded-pill <?= $badge ?>"><?= htmlspecialchars($status, ENT_QUOTES, 'UTF-8') ?></span>
                                 </td>
+                                <td class="px-4 py-3 text-end">
+                                    <?php 
+                                        $startTs = strtotime($b['booking_date'] . ' ' . $b['start_time']);
+                                    ?>
+                                    <?php if ($status === 'PENDING' && $startTs > time() + 3600): ?>
+                                        <form method="POST" action="<?= BASE_URL ?>index.php?controller=booking&action=cancel" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn đặt sân này không?');">
+                                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+                                            <input type="hidden" name="booking_id" value="<?= (int)$b['id'] ?>">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill">Hủy</button>
+                                        </form>
+                                    <?php endif; ?>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td class="px-4 py-4 text-center text-muted" colspan="5">Bạn chưa có đơn đặt sân nào.</td>
+                            <td class="px-4 py-4 text-center text-muted" colspan="6">Bạn chưa có đơn đặt sân nào.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>

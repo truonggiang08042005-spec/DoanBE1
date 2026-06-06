@@ -20,6 +20,34 @@ class AdminController {
         }
     }
 
+    public function dashboard() {
+        $this->requireAdmin();
+
+        $totalBookings = $this->bookingModel->getTotalBookings();
+        $totalRevenue = $this->bookingModel->getTotalRevenue();
+        $totalPitches = $this->pitchModel->getTotalPitches();
+        
+        require_once dirname(__DIR__) . '/models/User.php';
+        $userModel = new User();
+        $totalUsers = $userModel->getTotalUsers();
+
+        include dirname(__DIR__) . '/views/layouts/header.php';
+        include dirname(__DIR__) . '/views/admin/dashboard.php';
+        include dirname(__DIR__) . '/views/layouts/footer.php';
+    }
+
+    public function users() {
+        $this->requireAdmin();
+        
+        require_once dirname(__DIR__) . '/models/User.php';
+        $userModel = new User();
+        $users = $userModel->getAllUsers();
+
+        include dirname(__DIR__) . '/views/layouts/header.php';
+        include dirname(__DIR__) . '/views/admin/users.php';
+        include dirname(__DIR__) . '/views/layouts/footer.php';
+    }
+
     public function bookings() {
         $this->requireAdmin();
 
@@ -146,7 +174,13 @@ class AdminController {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = (int)($_POST['id'] ?? 0);
             if ($id > 0) {
-                $this->pitchModel->deletePitch($id);
+                $hasBookings = $this->bookingModel->hasBookingsForPitch($id);
+                if ($hasBookings) {
+                    $_SESSION['flash_error'] = "Không thể xóa sân này vì đã có lịch sử đặt sân. Vui lòng đổi trạng thái sang Bảo trì.";
+                } else {
+                    $this->pitchModel->deletePitch($id);
+                    $_SESSION['flash_success'] = "Đã xóa sân thành công.";
+                }
             }
         }
 

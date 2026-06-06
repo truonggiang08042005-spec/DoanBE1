@@ -59,6 +59,7 @@
                                 <td class="px-4 py-3 text-end">
                                     <div class="d-flex gap-2 justify-content-end">
                                         <form method="POST" action="<?= BASE_URL ?>index.php?controller=admin&action=updateBookingStatus">
+                                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                                             <input type="hidden" name="booking_id" value="<?= (int)$b['id'] ?>">
                                             <input type="hidden" name="status" value="CONFIRMED">
                                             <button class="btn btn-success btn-sm fw-bold rounded-3" type="submit" <?= $status === 'CONFIRMED' ? 'disabled' : '' ?>>
@@ -66,6 +67,7 @@
                                             </button>
                                         </form>
                                         <form method="POST" action="<?= BASE_URL ?>index.php?controller=admin&action=updateBookingStatus">
+                                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                                             <input type="hidden" name="booking_id" value="<?= (int)$b['id'] ?>">
                                             <input type="hidden" name="status" value="CANCELLED">
                                             <button class="btn btn-outline-danger btn-sm fw-bold rounded-3" type="submit" <?= $status === 'CANCELLED' ? 'disabled' : '' ?>>

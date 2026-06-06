@@ -67,4 +67,32 @@ class Booking {
         $stmt = $this->conn->prepare($query);
         return $stmt->execute([$status, $booking_id]);
     }
+
+    public function getBookingByIdAndUserId($booking_id, $user_id) {
+        $query = "SELECT * FROM " . $this->table_name . " WHERE id = ? AND user_id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute([$booking_id, $user_id]);
+        return $stmt->fetch();
+    }
+
+    public function hasBookingsForPitch($pitch_id) {
+        $query = "SELECT COUNT(*) FROM " . $this->table_name . " WHERE pitch_id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute([$pitch_id]);
+        return $stmt->fetchColumn() > 0;
+    }
+
+    public function getTotalBookings() {
+        $query = "SELECT COUNT(*) FROM " . $this->table_name . " WHERE status = 'CONFIRMED'";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
+
+    public function getTotalRevenue() {
+        $query = "SELECT SUM(total_price) FROM " . $this->table_name . " WHERE status = 'CONFIRMED'";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
 }

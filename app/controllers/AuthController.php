@@ -52,6 +52,7 @@ class AuthController {
                 if (!$user || !password_verify($password, $user['password_hash'])) {
                     $error = 'Tài khoản hoặc mật khẩu không đúng.';
                 } else {
+                    session_regenerate_id(true);
                     $_SESSION['user'] = [
                         'id' => $user['id'],
                         'username' => $user['username'],

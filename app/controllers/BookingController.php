@@ -61,6 +61,13 @@ class BookingController {
                 exit();
             }
 
+            if ($startTs < time()) {
+                $_SESSION['flash_error'] = "Không thể đặt sân ở thời điểm trong quá khứ.";
+                $_SESSION['old'] = $old;
+                header("Location: " . $redirectDetail);
+                exit();
+            }
+
             $hours = ($endTs - $startTs) / 3600;
             if ($hours < 1) {
                 $_SESSION['flash_error'] = "Khung giờ đặt tối thiểu là 1 tiếng.";
@@ -112,5 +119,34 @@ class BookingController {
         include dirname(__DIR__) . '/views/layouts/header.php';
         include dirname(__DIR__) . '/views/booking/history.php';
         include dirname(__DIR__) . '/views/layouts/footer.php';
+    }
+
+    public function cancel() {
+        if (empty($_SESSION['user']['id'])) {
+            header("Location: " . BASE_URL . "index.php?controller=auth&action=login");
+            exit();
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $booking_id = (int)($_POST['booking_id'] ?? 0);
+            if ($booking_id > 0) {
+                $booking = $this->bookingModel->getBookingByIdAndUserId($booking_id, $_SESSION['user']['id']);
+                
+                if ($booking && $booking['status'] === 'PENDING') {
+                    $startTs = strtotime($booking['booking_date'] . ' ' . $booking['start_time']);
+                    if ($startTs > time() + 3600) { // Can cancel if more than 1 hour before start
+                        $this->bookingModel->updateStatus($booking_id, 'CANCELLED');
+                        $_SESSION['flash_success'] = "Hủy đặt sân thành công.";
+                    } else {
+                        $_SESSION['flash_error'] = "Chỉ có thể hủy sân trước giờ đá ít nhất 1 tiếng.";
+                    }
+                } else {
+                    $_SESSION['flash_error'] = "Không thể hủy đơn đặt sân này.";
+                }
+            }
+        }
+        
+        header("Location: " . BASE_URL . "index.php?controller=booking&action=history");
+        exit();
     }
 }

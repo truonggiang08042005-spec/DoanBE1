@@ -24,6 +24,8 @@
 $isLoggedIn = !empty($_SESSION['user']);
 $flashSuccess = $_SESSION['flash_success'] ?? '';
 unset($_SESSION['flash_success']);
+$flashError = $_SESSION['flash_error'] ?? '';
+unset($_SESSION['flash_error']);
 ?>
 
 <header class="bg-white border-bottom shadow-sm fixed-top">
@@ -60,7 +62,7 @@ unset($_SESSION['flash_success']);
                             <?php if ($isLoggedIn): ?>
                                 <li><a class="dropdown-item rounded-3 fw-semibold" href="<?= BASE_URL ?>index.php?controller=booking&action=history"><i class="bi bi-clock-history me-2"></i>Lịch sử đặt sân</a></li>
                                 <?php if (!empty($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
-                                    <li><a class="dropdown-item rounded-3 fw-semibold" href="<?= BASE_URL ?>index.php?controller=admin&action=bookings"><i class="bi bi-speedometer2 me-2"></i>Admin</a></li>
+                                    <li><a class="dropdown-item rounded-3 fw-semibold" href="<?= BASE_URL ?>index.php?controller=admin&action=dashboard"><i class="bi bi-speedometer2 me-2"></i>Admin</a></li>
                                 <?php endif; ?>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item rounded-3 fw-bold text-danger" href="<?= BASE_URL ?>index.php?controller=auth&action=logout"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</a></li>
@@ -84,5 +86,10 @@ unset($_SESSION['flash_success']);
 <?php if (!empty($flashSuccess)): ?>
     <div class="alert alert-success rounded-4" role="alert">
         <?= htmlspecialchars($flashSuccess, ENT_QUOTES, 'UTF-8') ?>
+    </div>
+<?php endif; ?>
+<?php if (!empty($flashError)): ?>
+    <div class="alert alert-danger rounded-4" role="alert">
+        <?= htmlspecialchars($flashError, ENT_QUOTES, 'UTF-8') ?>
     </div>
 <?php endif; ?>

@@ -46,6 +46,7 @@
                                             Sửa
                                         </a>
                                         <form method="POST" action="<?= BASE_URL ?>index.php?controller=admin&action=deletePitch" onsubmit="return confirm('Xóa sân này?');">
+                                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                                             <input type="hidden" name="id" value="<?= (int)$p['id'] ?>">
                                             <button class="btn btn-outline-danger btn-sm fw-bold rounded-3" type="submit">Xóa</button>
                                         </form>

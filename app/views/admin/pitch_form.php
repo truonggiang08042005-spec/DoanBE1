@@ -26,6 +26,7 @@ $actionUrl = $isEdit
                 <?php endif; ?>
 
                 <form method="POST" action="<?= $actionUrl ?>">
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Tên sân</label>
                         <input class="form-control form-control-lg rounded-3" type="text" name="name" value="<?= htmlspecialchars($pitch['name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>

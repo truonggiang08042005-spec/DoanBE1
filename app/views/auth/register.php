@@ -152,6 +152,7 @@ $woodFrame = "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=phot
                             <?php endif; ?>
 
                             <form method="POST" action="<?= BASE_URL ?>index.php?controller=auth&action=register">
+                                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <div class="reg-label mb-1">Tên đăng nhập</div>

@@ -60,6 +60,7 @@ $isMaintenance = ($pitch['status'] ?? 'active') !== 'active';
                     </div>
                 <?php else: ?>
                     <form action="<?= BASE_URL ?>index.php?controller=booking&action=store" method="POST">
+                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                         <input type="hidden" name="pitch_id" value="<?= $pitch['id'] ?>">
 
                         <div class="row g-3">
