@@ -54,4 +54,13 @@ class User {
         $stmt->execute();
         return $stmt->fetchAll();
     }
+
+    public function update($id, $fullname, $phone) {
+        $query = "UPDATE " . $this->table_name . "
+                  SET fullname = ?, phone = ?
+                  WHERE id = ?";
+
+        $stmt = $this->conn->prepare($query);
+        return $stmt->execute([$fullname, $phone, $id]);
+    }
 }
