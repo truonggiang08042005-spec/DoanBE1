@@ -12,7 +12,7 @@ class User {
     }
 
     public function findById($id) {
-        $query = "SELECT id, username, fullname, phone, role, password_hash, created_at
+        $query = "SELECT id, username, fullname, phone, role, status, password_hash, created_at
                   FROM " . $this->table_name . "
                   WHERE id = ?
                   LIMIT 0,1";
@@ -23,7 +23,7 @@ class User {
     }
 
     public function findByUsername($username) {
-        $query = "SELECT id, username, fullname, phone, role, password_hash, created_at
+        $query = "SELECT id, username, fullname, phone, role, status, password_hash, created_at
                   FROM " . $this->table_name . "
                   WHERE username = ?
                   LIMIT 0,1";
@@ -42,14 +42,14 @@ class User {
     }
 
     public function getTotalUsers() {
-        $query = "SELECT COUNT(*) FROM " . $this->table_name . " WHERE role = 'customer'";
+        $query = "SELECT COUNT(*) FROM " . $this->table_name . " WHERE role != 'superadmin'";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt->fetchColumn();
     }
 
     public function getAllUsers() {
-        $query = "SELECT id, username, fullname, phone, role, created_at FROM " . $this->table_name . " WHERE role = 'customer' ORDER BY created_at DESC";
+        $query = "SELECT id, username, fullname, phone, role, status, created_at FROM " . $this->table_name . " ORDER BY created_at DESC";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll();
@@ -62,5 +62,26 @@ class User {
 
         $stmt = $this->conn->prepare($query);
         return $stmt->execute([$fullname, $phone, $id]);
+    }
+
+    public function updateByAdmin($id, $fullname, $phone, $role, $status) {
+        $query = "UPDATE " . $this->table_name . "
+                  SET fullname = ?, phone = ?, role = ?, status = ?
+                  WHERE id = ?";
+
+        $stmt = $this->conn->prepare($query);
+        return $stmt->execute([$fullname, $phone, $role, $status, $id]);
+    }
+
+    public function updateStatus($id, $status) {
+        $query = "UPDATE " . $this->table_name . " SET status = ? WHERE id = ?";
+        $stmt = $this->conn->prepare($query);
+        return $stmt->execute([$status, $id]);
+    }
+
+    public function deleteUser($id) {
+        $query = "DELETE FROM " . $this->table_name . " WHERE id = ?";
+        $stmt = $this->conn->prepare($query);
+        return $stmt->execute([$id]);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 $q = trim($_GET['q'] ?? '');
-$type = trim($_GET['type'] ?? '');
+$category_id = trim($_GET['category_id'] ?? '');
 $isLoggedIn = !empty($_SESSION['user']);
 $isAdmin = !empty($_SESSION['role']) && $_SESSION['role'] === 'admin';
 $location = trim($_GET['location'] ?? '');
@@ -242,11 +242,13 @@ $suggestedImages = [$pitchImg1, $pitchImg2, $pitchImg3, $pitchImg4];
 
                         <div class="col-12">
                             <label class="form-label fw-semibold text-muted">Quy mô sân</label>
-                            <select class="form-select form-select-lg rounded-3" name="type">
+                            <select class="form-select form-select-lg rounded-3" name="category_id">
                                 <option value="">Tất cả quy mô</option>
-                                <option value="Sân 5" <?= $type === 'Sân 5' ? 'selected' : '' ?>>Sân tiêu chuẩn 5 người</option>
-                                <option value="Sân 7" <?= $type === 'Sân 7' ? 'selected' : '' ?>>Sân tiêu chuẩn 7 người</option>
-                                <option value="Sân 11" <?= $type === 'Sân 11' ? 'selected' : '' ?>>Sân quốc tế 11 người</option>
+                                <?php foreach ($categories as $cat): ?>
+                                    <option value="<?= $cat['id'] ?>" <?= ((int)$category_id === (int)$cat['id']) ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($cat['name'], ENT_QUOTES, 'UTF-8') ?>
+                                    </option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
 

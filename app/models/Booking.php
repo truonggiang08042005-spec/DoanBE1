@@ -23,19 +23,20 @@ class Booking {
         return $stmt->fetchColumn() > 0;
     }
 
-    public function createBooking($user_id, $pitch_id, $customer_name, $customer_phone, $booking_date, $start_time, $end_time, $total_price) {
-        $query = "INSERT INTO " . $this->table_name . " (user_id, pitch_id, customer_name, customer_phone, booking_date, start_time, end_time, total_price, status) 
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'PENDING')";
+    public function createBooking($user_id, $pitch_id, $customer_name, $customer_phone, $booking_date, $start_time, $end_time, $total_price, $voucher_id = null, $discount_amount = 0) {
+        $query = "INSERT INTO " . $this->table_name . " (user_id, pitch_id, customer_name, customer_phone, booking_date, start_time, end_time, total_price, voucher_id, discount_amount, status) 
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDING')";
 
         $stmt = $this->conn->prepare($query);
-        return $stmt->execute([$user_id, $pitch_id, $customer_name, $customer_phone, $booking_date, $start_time, $end_time, $total_price]);
+        return $stmt->execute([$user_id, $pitch_id, $customer_name, $customer_phone, $booking_date, $start_time, $end_time, $total_price, $voucher_id, $discount_amount]);
     }
 
     public function getBookingsByUserId($user_id) {
         $query = "SELECT b.id, b.booking_date, b.start_time, b.end_time, b.total_price, b.status, b.created_at,
-                         p.name AS pitch_name, p.type AS pitch_type
+                         p.name AS pitch_name, c.name AS pitch_type
                   FROM " . $this->table_name . " b
                   INNER JOIN pitches p ON p.id = b.pitch_id
+                  LEFT JOIN categories c ON p.category_id = c.id
                   WHERE b.user_id = ?
                   ORDER BY b.booking_date DESC, b.start_time DESC";
 
@@ -47,10 +48,11 @@ class Booking {
     public function getAllBookings() {
         $query = "SELECT b.id, b.booking_date, b.start_time, b.end_time, b.total_price, b.status, b.created_at,
                          b.customer_name, b.customer_phone,
-                         p.name AS pitch_name, p.type AS pitch_type,
+                         p.name AS pitch_name, c.name AS pitch_type,
                          u.username AS user_username
                   FROM " . $this->table_name . " b
                   INNER JOIN pitches p ON p.id = b.pitch_id
+                  LEFT JOIN categories c ON p.category_id = c.id
                   LEFT JOIN users u ON u.id = b.user_id
                   ORDER BY b.created_at DESC";
 
@@ -59,8 +61,43 @@ class Booking {
         return $stmt->fetchAll();
     }
 
+    public function getActiveBookings() {
+        $query = "SELECT b.id, b.booking_date, b.start_time, b.end_time, b.total_price, b.status, b.created_at,
+                         b.customer_name, b.customer_phone,
+                         p.name AS pitch_name, c.name AS pitch_type,
+                         u.username AS user_username
+                  FROM " . $this->table_name . " b
+                  INNER JOIN pitches p ON p.id = b.pitch_id
+                  LEFT JOIN categories c ON p.category_id = c.id
+                  LEFT JOIN users u ON u.id = b.user_id
+                  WHERE b.status != 'PAID'
+                  ORDER BY b.created_at DESC";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    public function getRecentBookings($limit = 5) {
+        $query = "SELECT b.id, b.booking_date, b.start_time, b.end_time, b.total_price, b.status, b.created_at,
+                         b.customer_name, b.customer_phone,
+                         p.name AS pitch_name, c.name AS pitch_type,
+                         u.username AS user_username
+                  FROM " . $this->table_name . " b
+                  INNER JOIN pitches p ON p.id = b.pitch_id
+                  LEFT JOIN categories c ON p.category_id = c.id
+                  LEFT JOIN users u ON u.id = b.user_id
+                  ORDER BY b.created_at DESC
+                  LIMIT ?";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindValue(1, $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function updateStatus($booking_id, $status) {
-        if (!in_array($status, ['CONFIRMED', 'CANCELLED', 'PENDING'], true)) {
+        if (!in_array($status, ['CONFIRMED', 'CANCELLED', 'PENDING', 'PAID'], true)) {
             return false;
         }
         $query = "UPDATE " . $this->table_name . " SET status = ? WHERE id = ?";
@@ -90,9 +127,23 @@ class Booking {
     }
 
     public function getTotalRevenue() {
-        $query = "SELECT SUM(total_price) FROM " . $this->table_name . " WHERE status = 'CONFIRMED'";
+        $query = "SELECT SUM(total_price) FROM " . $this->table_name . " WHERE status = 'PAID'";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt->fetchColumn();
+    }
+
+    public function getRevenueLast7Days() {
+        $query = "
+            SELECT DATE(booking_date) as date, SUM(total_price) as daily_revenue
+            FROM " . $this->table_name . "
+            WHERE status = 'PAID'
+              AND booking_date >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+            GROUP BY DATE(booking_date)
+            ORDER BY DATE(booking_date) ASC
+        ";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

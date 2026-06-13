@@ -30,6 +30,13 @@ class PitchController {
         $old = $_SESSION['old'] ?? [];
         unset($_SESSION['old']);
 
+        $userVouchers = [];
+        if (!empty($_SESSION['user']['id'])) {
+            require_once dirname(__DIR__) . '/models/Voucher.php';
+            $voucherModel = new Voucher();
+            $userVouchers = $voucherModel->getUserClaimedVouchers($_SESSION['user']['id']);
+        }
+
         // Load view
         include dirname(__DIR__) . '/views/layouts/header.php';
         include dirname(__DIR__) . '/views/pitch/detail.php';

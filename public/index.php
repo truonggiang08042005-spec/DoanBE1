@@ -41,6 +41,23 @@ spl_autoload_register(function ($class) {
     }
 });
 
+// Check locked status for logged-in users on every request
+if (isset($_SESSION['user']['id']) && !isset($_GET['ignore_lock'])) {
+    $userModelForCheck = new User();
+    $currentUserCheck = $userModelForCheck->findById($_SESSION['user']['id']);
+    if ($currentUserCheck && $currentUserCheck['status'] === 'locked') {
+        // Destroy session and redirect
+        session_unset();
+        session_destroy();
+        session_write_close();
+        setcookie(session_name(), '', 0, '/');
+        session_regenerate_id(true);
+        
+        header("Location: " . BASE_URL . "index.php?controller=auth&action=login&error=locked");
+        exit();
+    }
+}
+
 $controllerName = isset($_GET['controller']) ? ucfirst($_GET['controller']) . 'Controller' : 'HomeController';
 $actionName = isset($_GET['action']) ? $_GET['action'] : 'index';
 

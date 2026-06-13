@@ -38,6 +38,9 @@ class AuthController {
         }
 
         $error = '';
+        if (isset($_GET['error']) && $_GET['error'] === 'locked') {
+            $error = 'Tài khoản của bạn đang bị khóa, vui lòng liên hệ nhân viên CSKH';
+        }
         $username = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -51,6 +54,8 @@ class AuthController {
 
                 if (!$user || !password_verify($password, $user['password_hash'])) {
                     $error = 'Tài khoản hoặc mật khẩu không đúng.';
+                } elseif ($user['status'] === 'locked') {
+                    $error = 'Tài khoản của bạn đang bị khóa, vui lòng liên hệ nhân viên CSKH';
                 } else {
                     session_regenerate_id(true);
                     $_SESSION['user'] = [

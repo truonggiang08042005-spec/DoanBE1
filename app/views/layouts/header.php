@@ -18,8 +18,13 @@
         body { 
             font-family: 'Inter', sans-serif; 
             background: var(--dark-bg); 
-            color: #e2e8f0;
+            color: #ffffff;
             padding-top: 92px; 
+        }
+
+        /* Override dark text to white/light */
+        .text-muted {
+            color: rgba(255, 255, 255, 0.75) !important;
         }
 
         /* Tối ưu hóa Header */
@@ -129,7 +134,7 @@ unset($_SESSION['flash_error']);
                 <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-lg-2">
                     <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>index.php">Trang Chủ</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>index.php#search">Tìm Sân</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>index.php#offers">Ưu Đãi</a></li>
+                    <li class="nav-item"><a class="nav-link fw-bold text-gold" href="<?= BASE_URL ?>index.php?controller=home&action=vouchers"><i class="bi bi-gift me-1"></i>Kho Voucher</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>index.php#tournament">Giải Đấu</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>index.php#teams">Đội Nhóm</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>index.php#support">Hỗ Trợ</a></li>
@@ -144,6 +149,7 @@ unset($_SESSION['flash_error']);
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4 p-2">
                             <?php if ($isLoggedIn): ?>
                                 <li><a class="dropdown-item rounded-3 fw-semibold" href="<?= BASE_URL ?>index.php?controller=profile&action=index"><i class="bi bi-person-circle me-2"></i>Hồ sơ của tôi</a></li>
+                                <li><a class="dropdown-item rounded-3 fw-semibold" href="<?= BASE_URL ?>index.php?controller=home&action=vouchers"><i class="bi bi-wallet2 me-2 text-success"></i>Ví Voucher</a></li>
                                 <li><a class="dropdown-item rounded-3 fw-semibold" href="<?= BASE_URL ?>index.php?controller=booking&action=history"><i class="bi bi-clock-history me-2"></i>Lịch sử đặt sân</a></li>
                                 <?php if (!empty($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
                                     <li><a class="dropdown-item rounded-3 fw-semibold" href="<?= BASE_URL ?>index.php?controller=admin&action=dashboard"><i class="bi bi-speedometer2 me-2 text-gold"></i>Hệ thống Admin</a></li>

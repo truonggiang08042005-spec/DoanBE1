@@ -31,52 +31,56 @@ class Pitch {
 
     public function getAllPitches() {
         if ($this->statusColumnExists()) {
-            $query = "SELECT id, name, type, price_per_hour, status
-                      FROM " . $this->table_name . "
-                      ORDER BY name ASC";
+            $query = "SELECT p.id, p.name, p.category_id, c.name AS type, p.price_per_hour, p.status
+                      FROM " . $this->table_name . " p
+                      LEFT JOIN categories c ON p.category_id = c.id
+                      ORDER BY p.name ASC";
         } else {
-            $query = "SELECT id, name, type, price_per_hour, 'active' AS status
-                      FROM " . $this->table_name . "
-                      ORDER BY name ASC";
+            $query = "SELECT p.id, p.name, p.category_id, c.name AS type, p.price_per_hour, 'active' AS status
+                      FROM " . $this->table_name . " p
+                      LEFT JOIN categories c ON p.category_id = c.id
+                      ORDER BY p.name ASC";
         }
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll();
     }
 
-    public function searchActivePitches($keyword = '', $type = '', $location = '') {
+    public function searchActivePitches($keyword = '', $category_id = '', $location = '') {
         $keyword = trim((string)$keyword);
-        $type = trim((string)$type);
+        $category_id = trim((string)$category_id);
         $location = trim((string)$location);
 
-        $where = $this->statusColumnExists() ? "WHERE status = 'active'" : "WHERE 1=1";
+        $where = $this->statusColumnExists() ? "WHERE p.status = 'active'" : "WHERE 1=1";
         $params = [];
 
         if ($keyword !== '') {
-            $where .= " AND name LIKE ?";
+            $where .= " AND p.name LIKE ?";
             $params[] = '%' . $keyword . '%';
         }
 
         if ($location !== '') {
-            $where .= " AND name LIKE ?";
+            $where .= " AND p.name LIKE ?";
             $params[] = '%' . $location . '%';
         }
 
-        if ($type !== '' && in_array($type, ['Sân 5', 'Sân 7', 'Sân 11'], true)) {
-            $where .= " AND type = ?";
-            $params[] = $type;
+        if ($category_id !== '' && is_numeric($category_id)) {
+            $where .= " AND p.category_id = ?";
+            $params[] = $category_id;
         }
 
         if ($this->statusColumnExists()) {
-            $query = "SELECT id, name, type, price_per_hour, status
-                      FROM " . $this->table_name . "
+            $query = "SELECT p.id, p.name, p.category_id, c.name AS type, p.price_per_hour, p.status
+                      FROM " . $this->table_name . " p
+                      LEFT JOIN categories c ON p.category_id = c.id
                       " . $where . "
-                      ORDER BY name ASC";
+                      ORDER BY p.name ASC";
         } else {
-            $query = "SELECT id, name, type, price_per_hour, 'active' AS status
-                      FROM " . $this->table_name . "
+            $query = "SELECT p.id, p.name, p.category_id, c.name AS type, p.price_per_hour, 'active' AS status
+                      FROM " . $this->table_name . " p
+                      LEFT JOIN categories c ON p.category_id = c.id
                       " . $where . "
-                      ORDER BY name ASC";
+                      ORDER BY p.name ASC";
         }
 
         $stmt = $this->conn->prepare($query);
@@ -86,14 +90,16 @@ class Pitch {
 
     public function getPitchById($id) {
         if ($this->statusColumnExists()) {
-            $query = "SELECT id, name, type, price_per_hour, status
-                      FROM " . $this->table_name . "
-                      WHERE id = ?
+            $query = "SELECT p.id, p.name, p.category_id, c.name AS type, p.price_per_hour, p.status
+                      FROM " . $this->table_name . " p
+                      LEFT JOIN categories c ON p.category_id = c.id
+                      WHERE p.id = ?
                       LIMIT 0,1";
         } else {
-            $query = "SELECT id, name, type, price_per_hour, 'active' AS status
-                      FROM " . $this->table_name . "
-                      WHERE id = ?
+            $query = "SELECT p.id, p.name, p.category_id, c.name AS type, p.price_per_hour, 'active' AS status
+                      FROM " . $this->table_name . " p
+                      LEFT JOIN categories c ON p.category_id = c.id
+                      WHERE p.id = ?
                       LIMIT 0,1";
         }
         $stmt = $this->conn->prepare($query);
@@ -102,48 +108,42 @@ class Pitch {
         return $stmt->fetch();
     }
 
-    public function createPitch($name, $type, $price_per_hour, $status) {
-        if (!in_array($type, ['Sân 5', 'Sân 7', 'Sân 11'], true)) {
-            return false;
-        }
+    public function createPitch($name, $category_id, $price_per_hour, $status) {
         if (!in_array($status, ['active', 'maintenance'], true)) {
             return false;
         }
 
         if ($this->statusColumnExists()) {
-            $query = "INSERT INTO " . $this->table_name . " (name, type, price_per_hour, status)
+            $query = "INSERT INTO " . $this->table_name . " (name, category_id, price_per_hour, status)
                       VALUES (?, ?, ?, ?)";
             $stmt = $this->conn->prepare($query);
-            return $stmt->execute([$name, $type, $price_per_hour, $status]);
+            return $stmt->execute([$name, $category_id, $price_per_hour, $status]);
         }
 
-        $query = "INSERT INTO " . $this->table_name . " (name, type, price_per_hour)
+        $query = "INSERT INTO " . $this->table_name . " (name, category_id, price_per_hour)
                   VALUES (?, ?, ?)";
         $stmt = $this->conn->prepare($query);
-        return $stmt->execute([$name, $type, $price_per_hour]);
+        return $stmt->execute([$name, $category_id, $price_per_hour]);
     }
 
-    public function updatePitch($id, $name, $type, $price_per_hour, $status) {
-        if (!in_array($type, ['Sân 5', 'Sân 7', 'Sân 11'], true)) {
-            return false;
-        }
+    public function updatePitch($id, $name, $category_id, $price_per_hour, $status) {
         if (!in_array($status, ['active', 'maintenance'], true)) {
             return false;
         }
 
         if ($this->statusColumnExists()) {
             $query = "UPDATE " . $this->table_name . "
-                      SET name = ?, type = ?, price_per_hour = ?, status = ?
+                      SET name = ?, category_id = ?, price_per_hour = ?, status = ?
                       WHERE id = ?";
             $stmt = $this->conn->prepare($query);
-            return $stmt->execute([$name, $type, $price_per_hour, $status, $id]);
+            return $stmt->execute([$name, $category_id, $price_per_hour, $status, $id]);
         }
 
         $query = "UPDATE " . $this->table_name . "
-                  SET name = ?, type = ?, price_per_hour = ?
+                  SET name = ?, category_id = ?, price_per_hour = ?
                   WHERE id = ?";
         $stmt = $this->conn->prepare($query);
-        return $stmt->execute([$name, $type, $price_per_hour, $id]);
+        return $stmt->execute([$name, $category_id, $price_per_hour, $id]);
     }
 
     public function deletePitch($id) {
