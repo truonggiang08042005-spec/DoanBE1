@@ -3,7 +3,7 @@
         <h4 class="fw-bold text-white mb-1">Cập nhật Người dùng</h4>
         <div class="text-muted small">Thay đổi thông tin liên hệ, trạng thái và cấp quyền truy cập.</div>
     </div>
-    <a class="btn btn-outline-secondary rounded-pill fw-bold" href="<?= BASE_URL ?>index.php?controller=admin&action=users">
+    <a class="btn btn-outline-secondary rounded-pill fw-bold" href="<?= BASE_URL ?>index.php?controller=user&action=users">
         <i class="bi bi-arrow-left me-1"></i>Quay lại danh sách
     </a>
 </div>
@@ -17,7 +17,7 @@
                 </div>
             <?php endif; ?>
 
-            <form method="POST" action="<?= BASE_URL ?>index.php?controller=admin&action=editUser&id=<?= $user['id'] ?>">
+            <form method="POST" action="<?= BASE_URL ?>index.php?controller=user&action=editUser&id=<?= $user['id'] ?>">
                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                 
                 <div class="mb-4">

@@ -1,16 +1,16 @@
 <?php
 $isEdit = ($mode ?? 'create') === 'edit';
 $actionUrl = $isEdit
-    ? (BASE_URL . "index.php?controller=admin&action=editCategory&id=" . (int)($category['id'] ?? 0))
-    : (BASE_URL . "index.php?controller=admin&action=createCategory");
+    ? (BASE_URL . "index.php?controller=category&action=editCategory&id=" . (int)($category['id'] ?? 0))
+    : (BASE_URL . "index.php?controller=category&action=createCategory");
 ?>
 
 <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
     <div>
         <h4 class="fw-bold text-white mb-1"><?= $isEdit ? 'Sửa danh mục' : 'Thêm danh mục mới' ?></h4>
-        <div class="text-muted small">Cung cấp thông tin tên gọi và mô tả cho loại hình sân mới.</div>
+        <div class="text-muted small">Phân loại và quản lý các loại sân bóng.</div>
     </div>
-    <a class="btn btn-outline-secondary rounded-pill fw-bold" href="<?= BASE_URL ?>index.php?controller=admin&action=categories">
+    <a class="btn btn-outline-secondary rounded-pill fw-bold" href="<?= BASE_URL ?>index.php?controller=category&action=categories">
         <i class="bi bi-arrow-left me-1"></i>Quay lại danh sách
     </a>
 </div>

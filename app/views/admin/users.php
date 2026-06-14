@@ -3,7 +3,7 @@
         <h4 class="fw-bold text-white mb-1">Quản lý Tài khoản (Users)</h4>
         <div class="text-muted small">Danh sách toàn bộ thành viên và quản trị viên trong hệ thống.</div>
     </div>
-    <a href="<?= BASE_URL ?>index.php?controller=admin&action=exportUsers" class="btn btn-success rounded-pill fw-bold shadow-sm">
+    <a href="<?= BASE_URL ?>index.php?controller=user&action=exportUsers" class="btn btn-success rounded-pill fw-bold shadow-sm">
         <i class="bi bi-file-earmark-excel me-1"></i>Xuất Excel (CSV)
     </a>
 </div>
@@ -55,17 +55,17 @@
                             <td class="px-4 py-3 text-end">
                                 <?php if ($u['role'] !== 'superadmin' || ($_SESSION['user']['role'] === 'superadmin')): ?>
                                     <div class="btn-group">
-                                        <a class="btn btn-sm btn-outline-secondary" href="<?= BASE_URL ?>index.php?controller=admin&action=editUser&id=<?= $u['id'] ?>" title="Sửa thông tin">
+                                        <a class="btn btn-sm btn-outline-secondary" href="<?= BASE_URL ?>index.php?controller=user&action=editUser&id=<?= $u['id'] ?>" title="Sửa thông tin">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
-                                        <form method="POST" action="<?= BASE_URL ?>index.php?controller=admin&action=lockUser" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn <?= $u['status'] === 'active' ? 'KHÓA' : 'MỞ KHÓA' ?> tài khoản này?');">
+                                        <form method="POST" action="<?= BASE_URL ?>index.php?controller=user&action=lockUser" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn <?= $u['status'] === 'active' ? 'KHÓA' : 'MỞ KHÓA' ?> tài khoản này?');">
                                             <input type="hidden" name="id" value="<?= $u['id'] ?>">
                                             <input type="hidden" name="current_status" value="<?= $u['status'] ?>">
                                             <button type="submit" class="btn btn-sm btn-outline-warning" title="<?= $u['status'] === 'active' ? 'Khóa' : 'Mở khóa' ?>">
                                                 <i class="bi <?= $u['status'] === 'active' ? 'bi-lock' : 'bi-unlock' ?>"></i>
                                             </button>
                                         </form>
-                                        <form method="POST" action="<?= BASE_URL ?>index.php?controller=admin&action=deleteUser" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa vĩnh viễn tài khoản này?');">
+                                        <form method="POST" action="<?= BASE_URL ?>index.php?controller=user&action=deleteUser" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa vĩnh viễn tài khoản này?');">
                                             <input type="hidden" name="id" value="<?= $u['id'] ?>">
                                             <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa">
                                                 <i class="bi bi-trash"></i>

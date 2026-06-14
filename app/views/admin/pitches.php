@@ -4,7 +4,7 @@
         <div class="text-muted small">Thêm, sửa, xóa và cập nhật trạng thái sân.</div>
     </div>
     <div class="d-flex gap-2">
-        <a class="btn btn-gold rounded-pill fw-bold px-4" href="<?= BASE_URL ?>index.php?controller=admin&action=createPitch">
+        <a class="btn btn-gold rounded-pill fw-bold px-4" href="<?= BASE_URL ?>index.php?controller=pitch&action=createPitch">
             <i class="bi bi-plus-circle me-1"></i>Thêm sân mới
         </a>
     </div>
@@ -38,10 +38,10 @@
                             <td class="px-4 py-3"><span class="badge rounded-pill <?= $badge ?>"><?= htmlspecialchars($status, ENT_QUOTES, 'UTF-8') ?></span></td>
                             <td class="px-4 py-3 text-end">
                                 <div class="d-flex gap-2 justify-content-end">
-                                    <a class="btn btn-outline-primary btn-sm fw-bold rounded-3" href="<?= BASE_URL ?>index.php?controller=admin&action=editPitch&id=<?= (int)$p['id'] ?>">
+                                    <a class="btn btn-outline-primary btn-sm fw-bold rounded-3" href="<?= BASE_URL ?>index.php?controller=pitch&action=editPitch&id=<?= (int)$p['id'] ?>">
                                         Sửa
                                     </a>
-                                    <form method="POST" action="<?= BASE_URL ?>index.php?controller=admin&action=deletePitch" onsubmit="return confirm('Xóa sân này?');">
+                                    <form method="POST" action="<?= BASE_URL ?>index.php?controller=pitch&action=deletePitch" onsubmit="return confirm('Xóa sân này?');">
                                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                                         <input type="hidden" name="id" value="<?= (int)$p['id'] ?>">
                                         <button class="btn btn-outline-danger btn-sm fw-bold rounded-3" type="submit">Xóa</button>

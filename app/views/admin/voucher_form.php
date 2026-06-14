@@ -1,8 +1,8 @@
 <?php
 $isEdit = ($mode ?? 'create') === 'edit';
 $actionUrl = $isEdit
-    ? (BASE_URL . "index.php?controller=admin&action=editVoucher&id=" . (int)($voucher['id'] ?? 0))
-    : (BASE_URL . "index.php?controller=admin&action=createVoucher");
+    ? (BASE_URL . "index.php?controller=voucher&action=editVoucher&id=" . (int)($voucher['id'] ?? 0))
+    : (BASE_URL . "index.php?controller=voucher&action=createVoucher");
 ?>
 
 <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
@@ -10,7 +10,7 @@ $actionUrl = $isEdit
         <h4 class="fw-bold text-white mb-1"><?= $isEdit ? 'Sửa mã giảm giá' : 'Thêm mã giảm giá mới' ?></h4>
         <div class="text-light opacity-75 small">Thiết lập mức giảm giá và giới hạn sử dụng.</div>
     </div>
-    <a class="btn btn-outline-secondary rounded-pill fw-bold" href="<?= BASE_URL ?>index.php?controller=admin&action=vouchers">
+    <a class="btn btn-outline-secondary rounded-pill fw-bold" href="<?= BASE_URL ?>index.php?controller=voucher&action=vouchers">
         <i class="bi bi-arrow-left me-1"></i>Quay lại
     </a>
 </div>

@@ -3,7 +3,7 @@
         <h4 class="fw-bold text-white mb-1">Quản lý Đặt sân</h4>
         <div class="text-muted small">Xác nhận hoặc hủy các đơn đặt sân từ khách hàng.</div>
     </div>
-    <a href="<?= BASE_URL ?>index.php?controller=admin&action=exportBookings" class="btn btn-success rounded-pill fw-bold shadow-sm">
+    <a href="<?= BASE_URL ?>index.php?controller=booking&action=exportBookings" class="btn btn-success rounded-pill fw-bold shadow-sm">
         <i class="bi bi-file-earmark-excel me-1"></i>Xuất Excel (CSV)
     </a>
 </div>
@@ -58,7 +58,7 @@
                                 </select>
                             </td>
                             <td class="px-4 py-3 text-end">
-                                <form id="form-booking-<?= (int)$b['id'] ?>" method="POST" action="<?= BASE_URL ?>index.php?controller=admin&action=updateBookingStatus">
+                                <form id="form-booking-<?= (int)$b['id'] ?>" method="POST" action="<?= BASE_URL ?>index.php?controller=booking&action=updateBookingStatus">
                                     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                                     <input type="hidden" name="booking_id" value="<?= (int)$b['id'] ?>">
                                     <button class="btn btn-gold btn-sm fw-bold rounded-3 px-3 shadow-sm" type="submit">

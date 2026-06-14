@@ -2,14 +2,25 @@
 
 require_once dirname(__DIR__) . '/models/Booking.php';
 require_once dirname(__DIR__) . '/models/Pitch.php';
+require_once dirname(__DIR__) . '/models/ActivityLog.php';
 
 class BookingController {
     private $bookingModel;
     private $pitchModel;
+    private $activityLogModel;
 
     public function __construct() {
         $this->bookingModel = new Booking();
         $this->pitchModel = new Pitch();
+        $this->activityLogModel = new ActivityLog();
+    }
+
+    private function requireAdmin() {
+        if (empty($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+            header("HTTP/1.1 403 Forbidden");
+            echo "403 Forbidden";
+            exit();
+        }
     }
 
     public function store() {
@@ -256,6 +267,97 @@ class BookingController {
         }
         
         header("Location: " . BASE_URL . "index.php?controller=booking&action=history");
+        exit();
+    }
+
+    // --- ADMIN METHODS ---
+
+    public function bookings() {
+        $this->requireAdmin();
+
+        $bookings = $this->bookingModel->getActiveBookings();
+
+        include dirname(__DIR__) . '/views/layouts/admin_header.php';
+        include dirname(__DIR__) . '/views/admin/bookings.php';
+        include dirname(__DIR__) . '/views/layouts/admin_footer.php';
+    }
+
+    public function paidBookings() {
+        $this->requireAdmin();
+
+        $searchName = trim($_GET['search'] ?? '');
+        $filterDate = trim($_GET['date'] ?? '');
+
+        $paidBookings = $this->bookingModel->getPaidBookings($searchName, $filterDate);
+
+        // Calculate total revenue from filtered results
+        $totalRevenue = 0;
+        foreach ($paidBookings as $b) {
+            $totalRevenue += (float)$b['total_price'];
+        }
+
+        include dirname(__DIR__) . '/views/layouts/admin_header.php';
+        include dirname(__DIR__) . '/views/admin/paid_bookings.php';
+        include dirname(__DIR__) . '/views/layouts/admin_footer.php';
+    }
+
+    public function updateBookingStatus() {
+        $this->requireAdmin();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header("Location: " . BASE_URL . "index.php?controller=booking&action=bookings");
+            exit();
+        }
+
+        $booking_id = (int)($_POST['booking_id'] ?? 0);
+        $status = $_POST['status'] ?? '';
+
+        if ($booking_id > 0 && in_array($status, ['CONFIRMED', 'CANCELLED', 'PAID'], true)) {
+            $this->bookingModel->updateStatus($booking_id, $status);
+            $actionDesc = "Cập nhật trạng thái đơn đặt sân ID {$booking_id} thành {$status}";
+            if ($status === 'PAID') {
+                $actionDesc = "Xác nhận đã thanh toán đơn đặt sân ID {$booking_id}";
+            }
+            $this->activityLogModel->logAction($_SESSION['user']['id'], 'UPDATE_BOOKING', $actionDesc);
+            $_SESSION['flash_success'] = "Cập nhật trạng thái đơn đặt sân thành công.";
+        } else {
+            $_SESSION['flash_error'] = "Dữ liệu không hợp lệ.";
+        }
+
+        header("Location: " . BASE_URL . "index.php?controller=booking&action=bookings");
+        exit();
+    }
+
+    public function exportBookings() {
+        $this->requireAdmin();
+        $bookings = $this->bookingModel->getAllBookings();
+
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename=bookings_export_' . date('Ymd_His') . '.csv');
+
+        $output = fopen('php://output', 'w');
+        fputs($output, "\xEF\xBB\xBF"); // UTF-8 BOM
+        fputcsv($output, ['ID Đơn', 'Khách hàng', 'SĐT', 'Sân', 'Ngày đá', 'Giờ đá', 'Giá sân', 'Mã GG', 'Giảm giá', 'Tổng tiền', 'Trạng thái', 'Ngày tạo']);
+
+        foreach ($bookings as $b) {
+            $voucher_code = ''; // Có thể join lấy code nhưng tạm bỏ qua code, hiển thị số tiền giảm
+            fputcsv($output, [
+                $b['id'],
+                $b['customer_name'],
+                $b['customer_phone'],
+                $b['pitch_name'],
+                $b['booking_date'],
+                $b['start_time'] . ' - ' . $b['end_time'],
+                $b['total_price'] + $b['discount_amount'], // Giá gốc
+                $b['voucher_id'] ? 'Có' : 'Không',
+                $b['discount_amount'],
+                $b['total_price'], // Giá cuối cùng
+                $b['status'],
+                $b['created_at']
+            ]);
+        }
+        fclose($output);
+        $this->activityLogModel->logAction($_SESSION['user']['id'], 'EXPORT_BOOKINGS', "Xuất file Excel danh sách lịch đặt sân");
         exit();
     }
 }

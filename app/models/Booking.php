@@ -78,6 +78,38 @@ class Booking {
         return $stmt->fetchAll();
     }
 
+    public function getPaidBookings($searchName = '', $filterDate = '') {
+        $query = "SELECT b.id, b.booking_date, b.start_time, b.end_time, b.total_price, b.status, b.created_at,
+                         b.customer_name, b.customer_phone, b.discount_amount, b.voucher_id,
+                         p.name AS pitch_name, c.name AS pitch_type,
+                         u.username AS user_username
+                  FROM " . $this->table_name . " b
+                  INNER JOIN pitches p ON p.id = b.pitch_id
+                  LEFT JOIN categories c ON p.category_id = c.id
+                  LEFT JOIN users u ON u.id = b.user_id
+                  WHERE b.status = 'PAID'";
+        
+        $params = [];
+        
+        if (!empty($searchName)) {
+            $query .= " AND (b.customer_name LIKE ? OR u.username LIKE ?)";
+            $searchPattern = '%' . $searchName . '%';
+            $params[] = $searchPattern;
+            $params[] = $searchPattern;
+        }
+
+        if (!empty($filterDate)) {
+            $query .= " AND b.booking_date = ?";
+            $params[] = $filterDate;
+        }
+
+        $query .= " ORDER BY b.booking_date DESC, b.start_time DESC";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
+    }
+
     public function getRecentBookings($limit = 5) {
         $query = "SELECT b.id, b.booking_date, b.start_time, b.end_time, b.total_price, b.status, b.created_at,
                          b.customer_name, b.customer_phone,

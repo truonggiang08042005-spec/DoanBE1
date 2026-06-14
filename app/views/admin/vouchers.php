@@ -3,7 +3,7 @@
         <h4 class="fw-bold text-white mb-1">Quản lý Khuyến mãi</h4>
         <div class="text-light opacity-75 small">Tạo và quản lý các mã giảm giá cho người dùng.</div>
     </div>
-    <a class="btn btn-gold rounded-pill fw-bold shadow-sm" href="<?= BASE_URL ?>index.php?controller=admin&action=createVoucher">
+    <a class="btn btn-gold rounded-pill fw-bold shadow-sm" href="<?= BASE_URL ?>index.php?controller=voucher&action=createVoucher">
         <i class="bi bi-plus-circle me-1"></i>Tạo mã mới
     </a>
 </div>
@@ -49,10 +49,10 @@
                                 <?php endif; ?>
                             </td>
                             <td class="px-4 py-3 text-end">
-                                <a href="<?= BASE_URL ?>index.php?controller=admin&action=editVoucher&id=<?= $v['id'] ?>" class="btn btn-sm btn-outline-info rounded-circle me-1" title="Sửa">
+                                <a href="<?= BASE_URL ?>index.php?controller=voucher&action=editVoucher&id=<?= $v['id'] ?>" class="btn btn-sm btn-outline-info rounded-circle me-1" title="Sửa">
                                     <i class="bi bi-pencil"></i>
                                 </a>
-                                <form method="POST" action="<?= BASE_URL ?>index.php?controller=admin&action=deleteVoucher" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa mã giảm giá này?');">
+                                <form method="POST" action="<?= BASE_URL ?>index.php?controller=voucher&action=deleteVoucher" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa mã giảm giá này?');">
                                     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                                     <input type="hidden" name="id" value="<?= $v['id'] ?>">
                                     <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" title="Xóa">

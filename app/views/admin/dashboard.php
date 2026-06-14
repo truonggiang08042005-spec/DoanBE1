@@ -68,7 +68,7 @@
         <div class="admin-card p-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h5 class="fw-bold text-white mb-0">5 Đơn đặt sân gần nhất</h5>
-                <a href="<?= BASE_URL ?>index.php?controller=admin&action=bookings" class="btn btn-sm btn-outline-secondary rounded-pill">Xem tất cả</a>
+                <a href="<?= BASE_URL ?>index.php?controller=booking&action=bookings" class="btn btn-sm btn-outline-secondary rounded-pill">Xem tất cả</a>
             </div>
             <div class="table-responsive">
                 <table class="table table-dark table-hover mb-0 align-middle">

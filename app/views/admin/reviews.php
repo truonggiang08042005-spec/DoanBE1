@@ -65,7 +65,7 @@
 <div class="modal fade" id="replyModal" tabindex="-1" aria-labelledby="replyModalLabel" aria-hidden="true" data-bs-theme="dark">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-4 border-secondary bg-dark text-light">
-            <form method="POST" action="<?= BASE_URL ?>index.php?controller=admin&action=replyReview">
+            <form method="POST" action="<?= BASE_URL ?>index.php?controller=review&action=replyReview">
                 <div class="modal-header border-bottom border-secondary pb-3">
                     <h5 class="modal-title fw-bold text-gold" id="replyModalLabel">Phản hồi khách hàng: <span id="replyCustomerName" class="text-white"></span></h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>

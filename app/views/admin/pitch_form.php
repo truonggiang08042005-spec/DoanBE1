@@ -1,16 +1,16 @@
 <?php
 $isEdit = ($mode ?? 'create') === 'edit';
 $actionUrl = $isEdit
-    ? (BASE_URL . "index.php?controller=admin&action=editPitch&id=" . (int)($pitch['id'] ?? 0))
-    : (BASE_URL . "index.php?controller=admin&action=createPitch");
+    ? (BASE_URL . "index.php?controller=pitch&action=editPitch&id=" . (int)($pitch['id'] ?? 0))
+    : (BASE_URL . "index.php?controller=pitch&action=createPitch");
 ?>
 
 <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
     <div>
-        <h4 class="fw-bold text-white mb-1"><?= $isEdit ? 'Sửa sân' : 'Thêm sân mới' ?></h4>
-        <div class="text-muted small">Quản lý thông tin và trạng thái sân.</div>
+        <h4 class="fw-bold text-white mb-1"><?= $isEdit ? 'Sửa sân bóng' : 'Thêm sân bóng mới' ?></h4>
+        <div class="text-light opacity-75 small">Nhập thông tin chi tiết về sân để hiển thị cho khách hàng.</div>
     </div>
-    <a class="btn btn-outline-secondary rounded-pill fw-bold" href="<?= BASE_URL ?>index.php?controller=admin&action=pitches">
+    <a class="btn btn-outline-secondary rounded-pill fw-bold" href="<?= BASE_URL ?>index.php?controller=pitch&action=pitches">
         <i class="bi bi-arrow-left me-1"></i>Quay lại danh sách
     </a>
 </div>

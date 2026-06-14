@@ -267,13 +267,19 @@ unset($_SESSION['flash_error']);
         
         <li class="sidebar-heading">Quản Lý Giao Dịch</li>
         <li class="sidebar-item">
-            <a href="<?= BASE_URL ?>index.php?controller=admin&action=bookings" class="sidebar-link <?= $currentAction === 'bookings' ? 'active' : '' ?>">
+            <a href="<?= BASE_URL ?>index.php?controller=booking&action=bookings" class="sidebar-link <?= $currentAction === 'bookings' ? 'active' : '' ?>">
                 <i class="bi bi-calendar-check"></i>
                 <span>Quản lý Đặt sân</span>
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="<?= BASE_URL ?>index.php?controller=admin&action=reviews" class="sidebar-link <?= $currentAction === 'reviews' ? 'active' : '' ?>">
+            <a href="<?= BASE_URL ?>index.php?controller=booking&action=paidBookings" class="sidebar-link <?= $currentAction === 'paidBookings' ? 'active' : '' ?>">
+                <i class="bi bi-cash-stack"></i>
+                <span>Đơn đã thanh toán</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
+            <a href="<?= BASE_URL ?>index.php?controller=review&action=reviews" class="sidebar-link <?= $currentAction === 'reviews' ? 'active' : '' ?>">
                 <i class="bi bi-chat-heart"></i>
                 <span>Quản lý Đánh giá</span>
                 <?php if ($pendingReviewsCount > 0): ?>
@@ -283,26 +289,26 @@ unset($_SESSION['flash_error']);
         </li>
 
         <li class="sidebar-item">
-            <a href="<?= BASE_URL ?>index.php?controller=admin&action=vouchers" class="sidebar-link <?= in_array($currentAction, ['vouchers', 'createVoucher', 'editVoucher']) ? 'active' : '' ?>">
+            <a href="<?= BASE_URL ?>index.php?controller=voucher&action=vouchers" class="sidebar-link <?= in_array($currentAction, ['vouchers', 'createVoucher', 'editVoucher']) ? 'active' : '' ?>">
                 <i class="bi bi-ticket-perforated"></i>
                 <span>Quản lý Khuyến mãi</span>
             </a>
         </li>
         <li class="sidebar-heading">Quản Lý Hệ Thống</li>
         <li class="sidebar-item">
-            <a href="<?= BASE_URL ?>index.php?controller=admin&action=pitches" class="sidebar-link <?= in_array($currentAction, ['pitches', 'createPitch', 'editPitch']) ? 'active' : '' ?>">
+            <a href="<?= BASE_URL ?>index.php?controller=pitch&action=pitches" class="sidebar-link <?= in_array($currentAction, ['pitches', 'createPitch', 'editPitch']) ? 'active' : '' ?>">
                 <i class="bi bi-grid"></i>
                 <span>Quản lý Sân bóng</span>
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="<?= BASE_URL ?>index.php?controller=admin&action=categories" class="sidebar-link <?= in_array($currentAction, ['categories', 'createCategory', 'editCategory']) ? 'active' : '' ?>">
+            <a href="<?= BASE_URL ?>index.php?controller=category&action=categories" class="sidebar-link <?= in_array($currentAction, ['categories', 'createCategory', 'editCategory']) ? 'active' : '' ?>">
                 <i class="bi bi-tags"></i>
                 <span>Quản lý Danh mục</span>
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="<?= BASE_URL ?>index.php?controller=admin&action=users" class="sidebar-link <?= $currentAction === 'users' ? 'active' : '' ?>">
+            <a href="<?= BASE_URL ?>index.php?controller=user&action=users" class="sidebar-link <?= $currentAction === 'users' ? 'active' : '' ?>">
                 <i class="bi bi-people"></i>
                 <span>Quản lý Khách hàng</span>
             </a>
