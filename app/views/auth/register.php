@@ -10,38 +10,24 @@ $woodFrame = "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=phot
         align-items: center;
     }
     .reg-frame {
+        /* The frame is now just a container for the card's shadow */
         position: relative;
-        border-radius: 28px;
-        padding: 10px;
-        background-image: url('<?= $woodFrame ?>');
-        background-size: cover;
-        background-position: center;
-        box-shadow: 0 24px 80px rgba(2, 6, 23, .30);
     }
     .reg-card {
         border-radius: 22px;
         position: relative;
         overflow: hidden;
-        background: radial-gradient(1200px 600px at 10% 10%, rgba(16, 185, 129, .22), transparent 60%),
-                    radial-gradient(900px 500px at 90% 20%, rgba(13, 110, 253, .18), transparent 60%),
-                    linear-gradient(135deg, rgba(6, 78, 59, .96), rgba(2, 44, 34, .98));
-    }
-    .reg-card::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background-image: url('<?= $patternBg ?>');
+        background-image: url('<?= BASE_URL ?>public/images/image.png');
         background-size: cover;
         background-position: center;
-        opacity: .35;
-        mix-blend-mode: screen;
-        pointer-events: none;
+        box-shadow: 0 24px 80px rgba(2, 6, 23, .30);
     }
-    .reg-card::after {
+    .reg-card::before {
+        /* This pseudo-element creates the dark overlay for text readability */
         content: "";
         position: absolute;
         inset: 0;
-        background: linear-gradient(180deg, rgba(2, 6, 23, .45), rgba(2, 6, 23, .10));
+        background-color: rgba(0, 0, 0, 0.6);
         pointer-events: none;
     }
     .reg-inner {

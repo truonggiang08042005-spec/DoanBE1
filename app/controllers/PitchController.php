@@ -91,14 +91,24 @@ class PitchController {
             } elseif (!is_numeric($pitch['price_per_hour']) || (float)$pitch['price_per_hour'] <= 0) {
                 $error = 'Giá theo giờ không hợp lệ.';
             } else {
-                $created = $this->pitchModel->createPitch($pitch['name'], (int)$pitch['category_id'], (float)$pitch['price_per_hour'], $pitch['status']);
-                if ($created) {
-                    $this->activityLogModel->logAction($_SESSION['user']['id'], 'CREATE_PITCH', "Tạo sân bóng mới: {$pitch['name']}");
-                    $_SESSION['flash_success'] = "Tạo sân bóng thành công.";
-                    header("Location: " . BASE_URL . "index.php?controller=pitch&action=pitches");
-                    exit();
+                $image = null;
+                if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+                    $image = $this->uploadImage($_FILES['image']);
+                    if (!$image) {
+                        $error = 'Tải ảnh lên thất bại. Vui lòng kiểm tra lại tệp ảnh.';
+                    }
                 }
-                $error = 'Không thể tạo sân.';
+
+                if (!$error) {
+                    $created = $this->pitchModel->createPitch($pitch['name'], (int)$pitch['category_id'], (float)$pitch['price_per_hour'], $pitch['status'], $image);
+                    if ($created) {
+                        $this->activityLogModel->logAction($_SESSION['user']['id'], 'CREATE_PITCH', "Tạo sân bóng mới: {$pitch['name']}");
+                        $_SESSION['flash_success'] = "Tạo sân bóng thành công.";
+                        header("Location: " . BASE_URL . "index.php?controller=pitch&action=pitches");
+                        exit();
+                    }
+                    $error = 'Không thể tạo sân.';
+                }
             }
         }
 
@@ -136,14 +146,24 @@ class PitchController {
             } elseif (!is_numeric($price_per_hour) || (float)$price_per_hour <= 0) {
                 $error = 'Giá theo giờ không hợp lệ.';
             } else {
-                $updated = $this->pitchModel->updatePitch($id, $name, (int)$category_id, (float)$price_per_hour, $status);
-                if ($updated) {
-                    $this->activityLogModel->logAction($_SESSION['user']['id'], 'UPDATE_PITCH', "Cập nhật sân bóng ID {$id}");
-                    $_SESSION['flash_success'] = "Cập nhật sân bóng thành công.";
-                    header("Location: " . BASE_URL . "index.php?controller=pitch&action=pitches");
-                    exit();
+                $image = $pitch['image'] ?? null;
+                if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+                    $image = $this->uploadImage($_FILES['image']);
+                    if (!$image) {
+                        $error = 'Tải ảnh lên thất bại. Vui lòng kiểm tra lại tệp ảnh.';
+                    }
                 }
-                $error = 'Không thể cập nhật sân.';
+
+                if (!$error) {
+                    $updated = $this->pitchModel->updatePitch($id, $name, (int)$category_id, (float)$price_per_hour, $status, $image);
+                    if ($updated) {
+                        $this->activityLogModel->logAction($_SESSION['user']['id'], 'UPDATE_PITCH', "Cập nhật sân bóng ID {$id}");
+                        $_SESSION['flash_success'] = "Cập nhật sân bóng thành công.";
+                        header("Location: " . BASE_URL . "index.php?controller=pitch&action=pitches");
+                        exit();
+                    }
+                    $error = 'Không thể cập nhật sân.';
+                }
             }
 
             $pitch['name'] = $name;
@@ -177,5 +197,38 @@ class PitchController {
 
         header("Location: " . BASE_URL . "index.php?controller=pitch&action=pitches");
         exit();
+    }
+
+    private function uploadImage($file) {
+        $targetDir = dirname(__DIR__, 2) . '/public/uploads/pitches/';
+        if (!file_exists($targetDir)) {
+            mkdir($targetDir, 0777, true);
+        }
+
+        $fileName = time() . '_' . basename($file['name']);
+        $targetFile = $targetDir . $fileName;
+        $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+
+        // Check if image file is a actual image or fake image
+        $check = getimagesize($file['tmp_name']);
+        if ($check === false) {
+            return false;
+        }
+
+        // Check file size (e.g., 5MB)
+        if ($file['size'] > 5000000) {
+            return false;
+        }
+
+        // Allow certain file formats
+        if (!in_array($imageFileType, ['jpg', 'png', 'jpeg', 'gif'])) {
+            return false;
+        }
+
+        if (move_uploaded_file($file['tmp_name'], $targetFile)) {
+            return 'pitches/' . $fileName;
+        }
+
+        return false;
     }
 }

@@ -30,13 +30,14 @@ class Pitch {
     }
 
     public function getAllPitches() {
+        $imageCol = $this->imageColumnExists() ? ', p.image' : '';
         if ($this->statusColumnExists()) {
-            $query = "SELECT p.id, p.name, p.category_id, c.name AS type, p.price_per_hour, p.status
+            $query = "SELECT p.id, p.name, p.category_id, c.name AS type, p.price_per_hour, p.status {$imageCol}
                       FROM " . $this->table_name . " p
                       LEFT JOIN categories c ON p.category_id = c.id
                       ORDER BY p.name ASC";
         } else {
-            $query = "SELECT p.id, p.name, p.category_id, c.name AS type, p.price_per_hour, 'active' AS status
+            $query = "SELECT p.id, p.name, p.category_id, c.name AS type, p.price_per_hour, 'active' AS status {$imageCol}
                       FROM " . $this->table_name . " p
                       LEFT JOIN categories c ON p.category_id = c.id
                       ORDER BY p.name ASC";
@@ -44,6 +45,18 @@ class Pitch {
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll();
+    }
+
+    private function imageColumnExists() {
+        $stmt = $this->conn->prepare(
+            "SELECT COUNT(*)
+             FROM INFORMATION_SCHEMA.COLUMNS
+             WHERE TABLE_SCHEMA = ?
+               AND TABLE_NAME = ?
+               AND COLUMN_NAME = 'image'"
+        );
+        $stmt->execute([DB_NAME, $this->table_name]);
+        return ((int)$stmt->fetchColumn() > 0);
     }
 
     public function searchActivePitches($keyword = '', $category_id = '', $location = '') {
@@ -69,14 +82,15 @@ class Pitch {
             $params[] = $category_id;
         }
 
+        $imageCol = $this->imageColumnExists() ? ', p.image' : '';
         if ($this->statusColumnExists()) {
-            $query = "SELECT p.id, p.name, p.category_id, c.name AS type, p.price_per_hour, p.status
+            $query = "SELECT p.id, p.name, p.category_id, c.name AS type, p.price_per_hour, p.status {$imageCol}
                       FROM " . $this->table_name . " p
                       LEFT JOIN categories c ON p.category_id = c.id
                       " . $where . "
                       ORDER BY p.name ASC";
         } else {
-            $query = "SELECT p.id, p.name, p.category_id, c.name AS type, p.price_per_hour, 'active' AS status
+            $query = "SELECT p.id, p.name, p.category_id, c.name AS type, p.price_per_hour, 'active' AS status {$imageCol}
                       FROM " . $this->table_name . " p
                       LEFT JOIN categories c ON p.category_id = c.id
                       " . $where . "
@@ -89,14 +103,15 @@ class Pitch {
     }
 
     public function getPitchById($id) {
+        $imageCol = $this->imageColumnExists() ? ', p.image' : '';
         if ($this->statusColumnExists()) {
-            $query = "SELECT p.id, p.name, p.category_id, c.name AS type, p.price_per_hour, p.status
+            $query = "SELECT p.id, p.name, p.category_id, c.name AS type, p.price_per_hour, p.status {$imageCol}
                       FROM " . $this->table_name . " p
                       LEFT JOIN categories c ON p.category_id = c.id
                       WHERE p.id = ?
                       LIMIT 0,1";
         } else {
-            $query = "SELECT p.id, p.name, p.category_id, c.name AS type, p.price_per_hour, 'active' AS status
+            $query = "SELECT p.id, p.name, p.category_id, c.name AS type, p.price_per_hour, 'active' AS status {$imageCol}
                       FROM " . $this->table_name . " p
                       LEFT JOIN categories c ON p.category_id = c.id
                       WHERE p.id = ?
@@ -108,42 +123,61 @@ class Pitch {
         return $stmt->fetch();
     }
 
-    public function createPitch($name, $category_id, $price_per_hour, $status) {
+    public function createPitch($name, $category_id, $price_per_hour, $status, $image = null) {
         if (!in_array($status, ['active', 'maintenance'], true)) {
             return false;
         }
 
-        if ($this->statusColumnExists()) {
-            $query = "INSERT INTO " . $this->table_name . " (name, category_id, price_per_hour, status)
-                      VALUES (?, ?, ?, ?)";
-            $stmt = $this->conn->prepare($query);
-            return $stmt->execute([$name, $category_id, $price_per_hour, $status]);
+        $imageColExists = $this->imageColumnExists();
+        $statusColExists = $this->statusColumnExists();
+
+        $columns = 'name, category_id, price_per_hour';
+        $placeholders = '?, ?, ?';
+        $params = [$name, $category_id, $price_per_hour];
+
+        if ($statusColExists) {
+            $columns .= ', status';
+            $placeholders .= ', ?';
+            $params[] = $status;
         }
 
-        $query = "INSERT INTO " . $this->table_name . " (name, category_id, price_per_hour)
-                  VALUES (?, ?, ?)";
+        if ($imageColExists && $image !== null) {
+            $columns .= ', image';
+            $placeholders .= ', ?';
+            $params[] = $image;
+        }
+
+        $query = "INSERT INTO " . $this->table_name . " ({$columns}) VALUES ({$placeholders})";
         $stmt = $this->conn->prepare($query);
-        return $stmt->execute([$name, $category_id, $price_per_hour]);
+        return $stmt->execute($params);
     }
 
-    public function updatePitch($id, $name, $category_id, $price_per_hour, $status) {
+    public function updatePitch($id, $name, $category_id, $price_per_hour, $status, $image = null) {
         if (!in_array($status, ['active', 'maintenance'], true)) {
             return false;
         }
 
-        if ($this->statusColumnExists()) {
-            $query = "UPDATE " . $this->table_name . "
-                      SET name = ?, category_id = ?, price_per_hour = ?, status = ?
-                      WHERE id = ?";
-            $stmt = $this->conn->prepare($query);
-            return $stmt->execute([$name, $category_id, $price_per_hour, $status, $id]);
+        $imageColExists = $this->imageColumnExists();
+        $statusColExists = $this->statusColumnExists();
+
+        $setClauses = 'name = ?, category_id = ?, price_per_hour = ?';
+        $params = [$name, $category_id, $price_per_hour];
+
+        if ($statusColExists) {
+            $setClauses .= ', status = ?';
+            $params[] = $status;
         }
 
-        $query = "UPDATE " . $this->table_name . "
-                  SET name = ?, category_id = ?, price_per_hour = ?
-                  WHERE id = ?";
+        if ($imageColExists && $image !== null) {
+            $setClauses .= ', image = ?';
+            $params[] = $image;
+        }
+
+        $params[] = $id;
+
+        $query = "UPDATE " . $this->table_name . " SET {$setClauses} WHERE id = ?";
         $stmt = $this->conn->prepare($query);
-        return $stmt->execute([$name, $category_id, $price_per_hour, $id]);
+        return $stmt->execute($params);
     }
 
     public function deletePitch($id) {

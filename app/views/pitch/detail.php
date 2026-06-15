@@ -19,6 +19,11 @@ $isMaintenance = ($pitch['status'] ?? 'active') !== 'active';
 <div class="row g-4">
     <div class="col-lg-5">
         <div class="card border-0 shadow-sm rounded-4">
+            <?php if (!empty($pitch['image'])): ?>
+                <img src="<?= BASE_URL . 'public/uploads/' . htmlspecialchars($pitch['image'], ENT_QUOTES, 'UTF-8') ?>" class="card-img-top rounded-top-4" alt="<?= htmlspecialchars($pitch['name'], ENT_QUOTES, 'UTF-8') ?>" style="height: 250px; object-fit: cover;">
+            <?php else: ?>
+                <div class="bg-dark rounded-top-4" style="height: 250px;"></div>
+            <?php endif; ?>
             <div class="card-body p-4">
                 <h3 class="fw-black mb-1"><?= htmlspecialchars($pitch['name'], ENT_QUOTES, 'UTF-8') ?></h3>
                 <div class="d-flex flex-wrap gap-2 align-items-center mb-3">

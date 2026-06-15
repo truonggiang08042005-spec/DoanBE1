@@ -57,9 +57,9 @@
 </style>
 
 <footer class="custom-dark-footer mt-5" id="support">
-    <div class="container py-5">
+    <div class="container py-3">
         <div class="row g-4">
-            <div class="col-lg-4">
+            <div class="col-lg-5">
                 <div class="footer-title fs-5 mb-3">SÂN CỎ MỖI NGÀY</div>
                 <div class="pe-lg-4" style="line-height: 1.6;">Nền tảng kết nối và cung ứng các tổ hợp sân bóng mini cao cấp, mang lại trải nghiệm đặt lịch nhanh chóng, tiện lợi và minh bạch hàng đầu.</div>
                 <div class="d-flex gap-2 mt-4">
@@ -70,32 +70,20 @@
                 </div>
             </div>
             
-            <div class="col-sm-6 col-lg-2">
+            <div class="col-md-6 col-lg-3">
                 <div class="footer-title mb-3">LIÊN HỆ</div>
                 <div class="small mb-2 text-light"><i class="bi bi-telephone text-gold me-2"></i>0900 000 000</div>
                 <div class="small mb-2 text-light"><i class="bi bi-envelope text-gold me-2"></i>support@sanco.com</div>
                 <div class="small text-light"><i class="bi bi-geo-alt text-gold me-2"></i>TP. Hồ Chí Minh, VN</div>
             </div>
             
-            <div class="col-sm-6 col-lg-3">
+            <div class="col-md-6 col-lg-4">
                 <div class="footer-title mb-3">CHÍNH SÁCH & ĐIỀU KHOẢN</div>
                 <div class="d-flex flex-column gap-2 small">
                     <a class="footer-link text-decoration-none" href="#">Chính sách bảo mật thông tin</a>
                     <a class="footer-link text-decoration-none" href="#">Điều khoản sử dụng dịch vụ</a>
                     <a class="footer-link text-decoration-none" href="#">Cơ chế giải quyết khiếu nại</a>
                     <a class="footer-link text-decoration-none" href="#">Trung tâm hỗ trợ khách hàng</a>
-                </div>
-            </div>
-            
-            <div class="col-lg-3">
-                <div class="footer-title mb-3">TẢI ỨNG DỤNG DI ĐỘNG</div>
-                <div class="d-flex flex-column gap-2">
-                    <a class="btn btn-app-download rounded-3 fw-bold d-flex align-items-center justify-content-center gap-2 py-2" href="#">
-                        <i class="bi bi-apple fs-5"></i>App Store (iOS)
-                    </a>
-                    <a class="btn btn-app-download rounded-3 fw-bold d-flex align-items-center justify-content-center gap-2 py-2" href="#">
-                        <i class="bi bi-google-play fs-5"></i>Google Play (Android)
-                    </a>
                 </div>
             </div>
         </div>

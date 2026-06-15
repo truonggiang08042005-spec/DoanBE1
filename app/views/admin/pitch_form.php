@@ -24,11 +24,21 @@ $actionUrl = $isEdit
                 </div>
             <?php endif; ?>
 
-            <form method="POST" action="<?= $actionUrl ?>">
+            <form method="POST" action="<?= $actionUrl ?>" enctype="multipart/form-data">
                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                 <div class="mb-4">
                     <label class="form-label fw-semibold text-light">Tên sân</label>
                     <input class="form-control form-control-lg rounded-3 bg-dark text-white border-secondary" type="text" name="name" value="<?= htmlspecialchars($pitch['name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold text-light">Ảnh đại diện</label>
+                    <input class="form-control form-control-lg rounded-3 bg-dark text-white border-secondary" type="file" name="image">
+                    <?php if ($isEdit && !empty($pitch['image'])): ?>
+                        <div class="mt-3">
+                            <img src="<?= BASE_URL . 'public/uploads/' . htmlspecialchars($pitch['image'], ENT_QUOTES, 'UTF-8') ?>" alt="Ảnh hiện tại" class="img-thumbnail" style="max-width: 200px;">
+                        </div>
+                    <?php endif; ?>
                 </div>
 
                 <div class="row g-4 mb-4">

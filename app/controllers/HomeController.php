@@ -16,9 +16,18 @@ class HomeController {
 
         $pitches = $this->pitchModel->searchActivePitches($keyword, $category_id, $location);
         
-        require_once dirname(__DIR__) . '/models/Category.php';
-        $categoryModel = new Category();
-        $categories = $categoryModel->getAllCategories();
+        $categories = []; // Default to empty array
+        try {
+            require_once dirname(__DIR__) . '/models/Category.php';
+            $categoryModel = new Category();
+            $categories_data = $categoryModel->getAllCategories();
+            if (is_array($categories_data)) {
+                $categories = $categories_data;
+            }
+        } catch (Exception $e) {
+            // In a real application, you would log this error.
+            // For now, we ensure the page doesn't crash by keeping $categories as an empty array.
+        }
         
         // Load view
         include dirname(__DIR__) . '/views/layouts/header.php';

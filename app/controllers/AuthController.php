@@ -76,7 +76,6 @@ class AuthController {
 
         include dirname(__DIR__) . '/views/layouts/header.php';
         include dirname(__DIR__) . '/views/auth/login.php';
-        include dirname(__DIR__) . '/views/layouts/footer.php';
     }
 
     public function register() {
@@ -128,7 +127,6 @@ class AuthController {
 
         include dirname(__DIR__) . '/views/layouts/header.php';
         include dirname(__DIR__) . '/views/auth/register.php';
-        include dirname(__DIR__) . '/views/layouts/footer.php';
     }
 
     public function logout() {

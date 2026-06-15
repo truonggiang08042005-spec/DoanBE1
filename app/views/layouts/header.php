@@ -135,7 +135,6 @@ unset($_SESSION['flash_error']);
                     <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>index.php">Trang Chủ</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>index.php#search">Tìm Sân</a></li>
                     <li class="nav-item"><a class="nav-link fw-bold text-gold" href="<?= BASE_URL ?>index.php?controller=home&action=vouchers"><i class="bi bi-gift me-1"></i>Kho Voucher</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>index.php#tournament">Giải Đấu</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>index.php#teams">Đội Nhóm</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>index.php#support">Hỗ Trợ</a></li>
                 </ul>

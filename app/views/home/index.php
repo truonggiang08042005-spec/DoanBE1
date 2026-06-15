@@ -11,9 +11,9 @@ $pitchImg2 = BASE_URL . 'public/images/S1.jpg';
 $pitchImg3 = BASE_URL . 'public/images/S2.jpg';
 $pitchImg4 = BASE_URL . 'public/images/S4.jpg';
 
-$promoBg1 = BASE_URL . 'public/images/promo-bg-1.jpg';
-$promoBg2 = BASE_URL . 'public/images/promo-bg-2.jpg';
-$promoBg3 = BASE_URL . 'public/images/promo-bg-3.jpg';
+$promoBg1 = BASE_URL . 'public/images/GioVang.png';
+$promoBg2 = BASE_URL . 'public/images/KhuyenMai.png';
+$promoBg3 = BASE_URL . 'public/images/50k.png';
 
 $locations = [
     '' => 'Chọn địa điểm',
@@ -42,8 +42,7 @@ $slots = [
 
 $slot = trim($_GET['slot'] ?? '');
 
-$suggested = array_slice($pitches ?? [], 0, 4);
-$suggestedImages = [$pitchImg1, $pitchImg2, $pitchImg3, $pitchImg4];
+$suggested = isset($pitches) && is_array($pitches) ? array_slice($pitches, 0, 4) : [];
 ?>
 
 <style>
@@ -123,14 +122,25 @@ $suggestedImages = [$pitchImg1, $pitchImg2, $pitchImg3, $pitchImg4];
         border: 1px solid rgba(255, 255, 255, 0.1);
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     }
-    .hero-search .form-control { 
-        background: #1e293b; 
-        color: #fff; 
-        border: 0; 
-        padding-left: 18px; 
+    .hero-search .form-control,
+    .hero-search .form-select {
+        background-color: #1e293b;
+        color: #fff;
+        border: 0;
+    }
+    .hero-search .form-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23d4af37' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    }
+    .hero-search .form-control {
+        padding-left: 18px;
     }
     .hero-search .form-control::placeholder { color: #64748b; }
-    .hero-search .form-control:focus { background: #1e293b; color: #fff; box-shadow: none; }
+    .hero-search .form-control:focus,
+    .hero-search .form-select:focus {
+        background-color: #1e293b;
+        color: #fff;
+        box-shadow: none;
+    }
     .hero-search .input-group-text { border: 0; background: #1e293b; color: #d4af37; }
     .hero-search .btn { border-radius: 999px; margin: 6px; }
 
@@ -192,8 +202,17 @@ $suggestedImages = [$pitchImg1, $pitchImg2, $pitchImg3, $pitchImg4];
                     <input type="hidden" name="controller" value="home">
                     <input type="hidden" name="action" value="index">
                     <div class="input-group input-group-lg hero-search">
-                        <span class="input-group-text"><i class="bi bi-search"></i></span>
-                        <input class="form-control" type="text" name="q" value="<?= htmlspecialchars($q, ENT_QUOTES, 'UTF-8') ?>" placeholder="Tìm sân đấu cao cấp, quận huyện hoặc khung giờ...">
+                        <span class="input-group-text"><i class="bi bi-grid-3x3-gap-fill"></i></span>
+                        <select class="form-select" name="category_id" aria-label="Chọn quy mô sân">
+                            <option value="">Chọn quy mô sân để tìm kiếm...</option>
+                            <?php if (!empty($categories) && is_array($categories)): ?>
+                                <?php foreach ($categories as $cat): ?>
+                                    <option value="<?= $cat['id'] ?>" <?= ((int)$category_id === (int)$cat['id']) ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($cat['name'], ENT_QUOTES, 'UTF-8') ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
                         <button class="btn btn-gold fw-black px-4" type="submit">Tìm kiếm</button>
                     </div>
                 </form>
@@ -244,11 +263,13 @@ $suggestedImages = [$pitchImg1, $pitchImg2, $pitchImg3, $pitchImg4];
                             <label class="form-label fw-semibold text-muted">Quy mô sân</label>
                             <select class="form-select form-select-lg rounded-3" name="category_id">
                                 <option value="">Tất cả quy mô</option>
-                                <?php foreach ($categories as $cat): ?>
-                                    <option value="<?= $cat['id'] ?>" <?= ((int)$category_id === (int)$cat['id']) ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($cat['name'], ENT_QUOTES, 'UTF-8') ?>
-                                    </option>
-                                <?php endforeach; ?>
+                                <?php if (!empty($categories) && is_array($categories)): ?>
+                                    <?php foreach ($categories as $cat): ?>
+                                        <option value="<?= $cat['id'] ?>" <?= ((int)$category_id === (int)$cat['id']) ? 'selected' : '' ?>>
+                                            <?= htmlspecialchars($cat['name'], ENT_QUOTES, 'UTF-8') ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </select>
                         </div>
 
@@ -275,14 +296,18 @@ $suggestedImages = [$pitchImg1, $pitchImg2, $pitchImg3, $pitchImg4];
         <?php if (!empty($suggested)): ?>
             <?php foreach ($suggested as $i => $pitch): ?>
                 <?php
-                $img = $suggestedImages[$i] ?? $pitchImg1;
                 $rating = 4.6 + (((int)($pitch['id'] ?? 1) % 4) * 0.1);
                 $status = $pitch['status'] ?? 'active';
                 $isActive = $status === 'active';
+                
+                // Use the actual pitch image if available, otherwise a placeholder
+                $imgSrc = !empty($pitch['image']) 
+                    ? BASE_URL . 'public/uploads/' . htmlspecialchars($pitch['image'], ENT_QUOTES, 'UTF-8') 
+                    : $pitchImg1; // $pitchImg1 is a default placeholder
                 ?>
                 <div class="col-md-6 col-lg-3">
                     <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
-                        <img src="<?= $img ?>" class="w-100" style="height: 160px; object-fit: cover; filter: brightness(0.9);" alt="Sân bóng">
+                        <img src="<?= $imgSrc ?>" class="w-100" style="height: 160px; object-fit: cover; filter: brightness(0.9);" alt="<?= htmlspecialchars(($pitch['name'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
                         <div class="card-body p-4">
                             <div class="fw-black fs-5 mb-1 text-white"><?= htmlspecialchars(($pitch['name'] ?? ''), ENT_QUOTES, 'UTF-8') ?></div>
                             <div class="text-muted small mb-2"><i class="bi bi-geo-alt me-1"></i>Sân Thống Nhất - Tân Bình</div>
@@ -316,7 +341,7 @@ $suggestedImages = [$pitchImg1, $pitchImg2, $pitchImg3, $pitchImg4];
     <div class="row g-4">
         <div class="col-lg-4">
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
-                <div style="height: 160px; background-image: url('<?= $promoBg1 ?>'); background-size: cover; background-position: center; filter: brightness(0.7);"></div>
+                <img src="<?= $promoBg1 ?>" class="card-img-top" alt="Ưu đãi giảm 20% giờ vàng" style="height: 160px; object-fit: cover; filter: brightness(0.7);">
                 <div class="card-body p-4">
                     <div class="fw-black fs-5 text-white">GIẢM 20% KHUNG GIỜ VÀNG</div>
                     <div class="text-muted mb-3">Áp dụng từ 13h - 16h mỗi ngày</div>
@@ -326,7 +351,7 @@ $suggestedImages = [$pitchImg1, $pitchImg2, $pitchImg3, $pitchImg4];
         </div>
         <div class="col-lg-4">
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
-                <div style="height: 160px; background-image: url('<?= $promoBg2 ?>'); background-size: cover; background-position: center; filter: brightness(0.7);"></div>
+                <img src="<?= $promoBg2 ?>" class="card-img-top" alt="Ưu đãi tặng nước" style="height: 160px; object-fit: cover; filter: brightness(0.7);">
                 <div class="card-body p-4">
                     <div class="fw-black fs-5 text-white">TẶNG NƯỚC KHI ĐẶT TRÊN 2H</div>
                     <div class="text-muted mb-3">Tiếp năng lượng cho các chiến binh</div>
@@ -336,7 +361,7 @@ $suggestedImages = [$pitchImg1, $pitchImg2, $pitchImg3, $pitchImg4];
         </div>
         <div class="col-lg-4">
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
-                <div style="height: 160px; background-image: url('<?= $promoBg3 ?>'); background-size: cover; background-position: center; filter: brightness(0.7);"></div>
+                <img src="<?= $promoBg3 ?>" class="card-img-top" alt="Voucher cho khách mới" style="height: 160px; object-fit: cover; filter: brightness(0.7);">
                 <div class="card-body p-4">
                     <div class="fw-black fs-5 text-white">VOUCHER 50K CHO KHÁCH MỚI</div>
                     <div class="text-muted mb-3">Chào mừng bạn gia nhập câu lạc bộ</div>
@@ -351,7 +376,7 @@ $suggestedImages = [$pitchImg1, $pitchImg2, $pitchImg3, $pitchImg4];
     <div class="row g-4">
         <div class="col-lg-6">
             <div class="card border-0 shadow-sm rounded-4 h-100">
-                <div class="card-body p-4">
+                <div class="card-body p-4 text-center">
                     <div class="fw-black fs-5 mb-1 text-white">Cộng Đồng Đội Nhóm</div>
                     <div class="text-muted mb-3">Gắn kết đồng đội, kiến tạo những trận cầu đỉnh cao một cách dễ dàng.</div>
                     <a class="btn btn-outline-secondary fw-bold rounded-pill text-white border-secondary" href="#">Khám phá ngay</a>
@@ -359,11 +384,11 @@ $suggestedImages = [$pitchImg1, $pitchImg2, $pitchImg3, $pitchImg4];
             </div>
         </div>
         <div class="col-lg-6">
-            <div class="card border-0 shadow-sm rounded-4 h-100" id="support">
-                <div class="card-body p-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100" id="support-card">
+                <div class="card-body p-4 text-center">
                     <div class="fw-black fs-5 mb-1 text-white">Hỗ Trợ Thượng Khách</div>
                     <div class="text-muted mb-3">Đội ngũ CSKH chuyên nghiệp luôn sẵn sàng hỗ trợ bạn 24/7.</div>
-                    <a class="btn btn-outline-secondary fw-bold rounded-pill text-white border-secondary" href="#">Liên hệ Hotline</a>
+                    <a class="btn btn-outline-secondary fw-bold rounded-pill text-white border-secondary" href="#support">Liên hệ Hotline</a>
                 </div>
             </div>
         </div>
